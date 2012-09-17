@@ -15,6 +15,8 @@ parser.add_argument('--port', type=str, dest='port', action='store', default='27
 parser.add_argument('--db', type=str, dest='db', action='store', default='testdb', help='the database name')
 parser.add_argument('--data-dir', type=str, dest='data_dir', default='/home/ubuntu/s3/', help='the directory containing data to load into the db')
 parser.add_argument('--collection', type=str, dest='collection', default='brains', help='the mongo collection to use')
+# TODO make sure that this default is higher than the number of files from S3
+parser.add_argument('--limit-files', type=int, dest='limit_files', default=100000, help='limit the number of files to throw at the mongo server')
 
 args = parser.parse_args()
 
@@ -32,11 +34,16 @@ db = connection[args.db]
 
 grid = gridfs.GridFS(db, args.collection)
 
+in_memory_files ={}
 i = 0
 for path in file_list:
-	f = open(base_dir + path)
+	f = open(args.data_dir + path)
 	data = f.read()
-	grid.put(data, filename=path)
+	f.close()
+	in_memory_files[path] = data
 	i += 1
-	if i >= 1000:
-		break
+	if i >= args.limit_files:
+		break;
+
+for (path, data) in in_memory_files.iteritems():
+	grid.put(data, filename=path)
