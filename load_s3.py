@@ -4,6 +4,7 @@ import pymongo
 import gridfs
 import os
 import argparse
+import time
 
 parser = argparse.ArgumentParser(description="Throw a section of the S3 bucket at a mongo server")
 parser.add_argument('--node-count', type=int, dest='node_count', action='store', required=True, help='the number of nodes throwing data at mongo')
@@ -45,5 +46,10 @@ for path in file_list:
 	if i >= args.limit_files:
 		break;
 
+start = time.time()
 for (path, data) in in_memory_files.iteritems():
 	grid.put(data, filename=path)
+end = time.time()
+deltaTime = end - start
+print len(in_memory_files),'files in', deltaTime,'seconds'
+print len(in_memory_files) / deltaTime, 'files / second'
