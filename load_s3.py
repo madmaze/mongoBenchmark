@@ -18,6 +18,7 @@ parser.add_argument('--data-dir', type=str, dest='data_dir', default='/home/ubun
 parser.add_argument('--collection', type=str, dest='collection', default='brains', help='the mongo collection to use')
 # TODO make sure that this default is higher than the number of files from S3
 parser.add_argument('--limit-files', type=int, dest='limit_files', default=100000, help='limit the number of files to throw at the mongo server')
+parser.add_argument('--enable-checkpoint', dest='enable_checkpoint', action='store_const', const=True, default=False, help='wait for the other client nodes to load data into memory before assaulting mongodb')
 
 args = parser.parse_args()
 
@@ -45,12 +46,14 @@ for path in file_list:
 	i += 1
 	if i >= args.limit_files:
 		break;
-f = open('node_' + str(args.node), 'w')
-f.close()
+if args.enable_checkpoint:
+	f = open('node_' + str(args.node), 'w')
+	f.close()
 try:
-	for i in xrange(args.node_count):
-		while not os.path.exists('node_'+str(i)):
-			pass
+	if args.enable_checkpoint:
+		for i in xrange(args.node_count):
+			while not os.path.exists('node_'+str(i)):
+				pass
 	
 	start = time.time()
 	for (path, data) in in_memory_files.iteritems():
@@ -60,7 +63,8 @@ try:
 	print len(in_memory_files),'files in', deltaTime,'seconds'
 	print len(in_memory_files) / deltaTime, 'files / second'
 finally:
-	try:
-		os.remove('node_' + str(args.node))
-	except:
-		pass
+	if args.enable_checkpoint:
+		try:
+			os.remove('node_' + str(args.node))
+		except:
+			pass
