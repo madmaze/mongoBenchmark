@@ -46,10 +46,13 @@ for path in file_list:
 	i += 1
 	if i >= args.limit_files:
 		break;
+
 if args.enable_checkpoint:
 	f = open('node_' + str(args.node), 'w')
 	f.close()
+
 try:
+	# TODO Rich says to use inotify
 	if args.enable_checkpoint:
 		for i in xrange(args.node_count):
 			while not os.path.exists('node_'+str(i)):
