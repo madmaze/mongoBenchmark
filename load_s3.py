@@ -26,6 +26,7 @@ file_list = os.listdir(args.data_dir)
 total_count = len(file_list)
 chunk_size = total_count / args.node_count
 # Take care of the last few files at the end
+chunk_size = min(chunk_size, arg.limit_files)
 file_list = file_list[chunk_size * args.node : chunk_size * (args.node + 1)]
 
 #connection = pymongo.Connection('mongodb://dba:sql@ds037637-a.mongolab.com:37637/mongotest')
@@ -37,15 +38,11 @@ db = connection[args.db]
 grid = gridfs.GridFS(db, args.collection)
 
 in_memory_files ={}
-i = 0
 for path in file_list:
 	f = open(args.data_dir + path)
 	data = f.read()
 	f.close()
 	in_memory_files[path] = data
-	i += 1
-	if i >= args.limit_files:
-		break;
 
 if args.enable_checkpoint:
 	f = open('node_' + str(args.node), 'w')
@@ -63,8 +60,8 @@ try:
 		grid.put(data, filename=path)
 	end = time.time()
 	deltaTime = end - start
-	print len(in_memory_files),'files in', deltaTime,'seconds'
-	print len(in_memory_files) / deltaTime, 'files / second'
+	print chunk_size,'files in', deltaTime,'seconds'
+	print chunk_size / deltaTime, 'files / second'
 finally:
 	if args.enable_checkpoint:
 		try:
