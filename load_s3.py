@@ -45,11 +45,22 @@ for path in file_list:
 	i += 1
 	if i >= args.limit_files:
 		break;
-
-start = time.time()
-for (path, data) in in_memory_files.iteritems():
-	grid.put(data, filename=path)
-end = time.time()
-deltaTime = end - start
-print len(in_memory_files),'files in', deltaTime,'seconds'
-print len(in_memory_files) / deltaTime, 'files / second'
+f = open('node_' + str(args.node), 'w')
+f.close()
+try:
+	for i in xrange(args.node_count):
+		while not os.path.exists('node_'+str(i)):
+			pass
+	
+	start = time.time()
+	for (path, data) in in_memory_files.iteritems():
+		grid.put(data, filename=path)
+	end = time.time()
+	deltaTime = end - start
+	print len(in_memory_files),'files in', deltaTime,'seconds'
+	print len(in_memory_files) / deltaTime, 'files / second'
+finally:
+	try:
+		os.remove('node_' + str(args.node))
+	except:
+		pass
