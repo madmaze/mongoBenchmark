@@ -4,6 +4,7 @@ import pymongo
 import gridfs
 import os
 import argparse
+import time
 
 parser = argparse.ArgumentParser(description="Throw a section of the S3 bucket at a mongo server")
 parser.add_argument('--node-count', type=int, dest='node_count', action='store', required=True, help='the number of nodes throwing data at mongo')
@@ -15,6 +16,9 @@ parser.add_argument('--port', type=str, dest='port', action='store', default='27
 parser.add_argument('--db', type=str, dest='db', action='store', default='testdb', help='the database name')
 parser.add_argument('--data-dir', type=str, dest='data_dir', default='/home/ubuntu/s3/', help='the directory containing data to load into the db')
 parser.add_argument('--collection', type=str, dest='collection', default='brains', help='the mongo collection to use')
+# TODO make sure that this default is higher than the number of files from S3
+parser.add_argument('--limit-files', type=int, dest='limit_files', default=100000, help='limit the number of files to throw at the mongo server')
+parser.add_argument('--enable-checkpoint', dest='enable_checkpoint', action='store_const', const=True, default=False, help='wait for the other client nodes to load data into memory before assaulting mongodb')
 
 args = parser.parse_args()
 
@@ -32,11 +36,38 @@ db = connection[args.db]
 
 grid = gridfs.GridFS(db, args.collection)
 
+in_memory_files ={}
 i = 0
 for path in file_list:
-	f = open(base_dir + path)
+	f = open(args.data_dir + path)
 	data = f.read()
-	grid.put(data, filename=path)
+	f.close()
+	in_memory_files[path] = data
 	i += 1
-	if i >= 1000:
-		break
+	if i >= args.limit_files:
+		break;
+
+if args.enable_checkpoint:
+	f = open('node_' + str(args.node), 'w')
+	f.close()
+
+try:
+	# TODO Rich says to use inotify
+	if args.enable_checkpoint:
+		for i in xrange(args.node_count):
+			while not os.path.exists('node_'+str(i)):
+				pass
+	
+	start = time.time()
+	for (path, data) in in_memory_files.iteritems():
+		grid.put(data, filename=path)
+	end = time.time()
+	deltaTime = end - start
+	print len(in_memory_files),'files in', deltaTime,'seconds'
+	print len(in_memory_files) / deltaTime, 'files / second'
+finally:
+	if args.enable_checkpoint:
+		try:
+			os.remove('node_' + str(args.node))
+		except:
+			pass
