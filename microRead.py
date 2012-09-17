@@ -7,14 +7,8 @@ user = "user"
 passwd = "whatever"
 server = "ds037627-a.mongolab.com:37627"
 inserts = 50
-id = 1
-try:
-  id = int(sys.argv[1])
-except:
-  print "You forgot to give me an ID"
-  sys.exit(-1)
-if len(sys.argv) > 2 and int(sys.argv[2]):
-  inserts = int(sys.argv[2])
+if sys.argc > 1 and int(sys.argv[1]):
+  inserts = int(sys.argv[1])
 
 conn = pymongo.Connection('mongodb://%s:%s@%s/mongodb' % (user,passwd,server))
 
