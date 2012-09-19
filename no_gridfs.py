@@ -1,7 +1,6 @@
 #! /usr/bin/env python
 
 import pymongo
-import gridfs
 import os
 import argparse
 import time
@@ -35,15 +34,16 @@ file_list = file_list[chunk_size * args.node : chunk_size * (args.node + 1)]
 connection = pymongo.Connection('mongodb://' + args.user + ':' + args.passwd + '@' + args.server + ':' + args.port + '/' + args.db)
 #db = connection['mongotest']
 db = connection[args.db]
-
-grid = gridfs.GridFS(db, args.collection)
+collection = db[args.collection]
 
 in_memory_files ={}
+documents = []
 for path in file_list:
-	f = open(args.data_dir + path)
+	f = open(args.data_dir + '/' + path)
 	data = f.read()
 	f.close()
 	in_memory_files[path] = data
+	documents.append({'_id':path, 'data':data})
 
 print 'All files for node',args.node,'are loaded into memory.'
 
@@ -61,8 +61,9 @@ try:
 		raw_input('Press enter to continue.')
 	
 	start = time.time()
-	for (path, data) in in_memory_files.iteritems():
-		grid.put(data, filename=path)
+	for doc in documents:
+		collection.insert(doc)
+	#collection.insert(documents)
 	end = time.time()
 	deltaTime = end - start
 	print chunk_size,'files in', deltaTime,'seconds'
