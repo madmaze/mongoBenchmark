@@ -40,7 +40,7 @@ grid = gridfs.GridFS(db, args.collection)
 
 in_memory_files ={}
 for path in file_list:
-	f = open(args.data_dir + path)
+	f = open(args.data_dir + '/' + path)
 	data = f.read()
 	f.close()
 	in_memory_files[path] = data
