@@ -19,6 +19,7 @@ parser.add_argument('--collection', type=str, dest='collection', default='brains
 # TODO make sure that this default is higher than the number of files from S3
 parser.add_argument('--limit-files', type=int, dest='limit_files', default=100000, help='limit the number of files to throw at the mongo server')
 parser.add_argument('--enable-checkpoint', dest='enable_checkpoint', action='store_const', const=True, default=False, help='wait for the other client nodes to load data into memory before assaulting mongodb')
+parser.add_argument('--enable-prompt', dest='enable_prompt', action='store_const', const=True, default=False, help='prompt for input after loading from disk and before assaulting the server')
 
 args = parser.parse_args()
 
@@ -44,6 +45,8 @@ for path in file_list:
 	f.close()
 	in_memory_files[path] = data
 
+print 'All files for node',args.node,'are loaded into memory.'
+
 if args.enable_checkpoint:
 	f = open('node_' + str(args.node), 'w')
 	f.close()
@@ -54,6 +57,8 @@ try:
 		for i in xrange(args.node_count):
 			while not os.path.exists('node_'+str(i)):
 				pass
+	if args.enable_prompt:
+		raw_input('Press enter to continue.')
 	
 	start = time.time()
 	for (path, data) in in_memory_files.iteritems():
