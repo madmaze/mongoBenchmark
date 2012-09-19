@@ -4,7 +4,7 @@ import os
 import argparse
 import base64
 
-parser = argparse.ArgumentParser(description="Throw a section of the S3 bucket at a mongo server")
+parser = argparse.ArgumentParser(description="Base64 encode all the files in a directory")
 parser.add_argument('--data-dir', type=str, dest='data_dir', default='/home/ubuntu/s3/', help='the directory containing data to load into the db')
 parser.add_argument('--output', type=str, dest='output', default='/mnt/b64/', help='the directory to place output files in')
 

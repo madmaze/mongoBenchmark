@@ -1,12 +1,9 @@
 #! /usr/bin/env python
 
-import pymongo
-import gridfs
 import os
 import argparse
-import time
 
-parser = argparse.ArgumentParser(description="Throw a section of the S3 bucket at a mongo server")
+parser = argparse.ArgumentParser(description="Takes the files in a directory and concatenates them (n) at a time")
 parser.add_argument('--data-dir', type=str, dest='data_dir', default='/home/ubuntu/s3/', help='the directory containing data to load into the db')
 parser.add_argument('--chunk-size', type=int, dest='chunk_size', default=200, help='the number of s3 files to concatenate into one file.')
 parser.add_argument('--output', type=str, dest='output', default='/mnt/big_chunks/', help='the directory to place output files in')
@@ -25,4 +22,5 @@ for idx, file_list in enumerate(partitions):
 		input_file.close()
 		output_file.write(data)
 	output_file.close()
+	print 'wrote file',idx
 
