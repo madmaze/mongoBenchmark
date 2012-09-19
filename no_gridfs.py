@@ -43,7 +43,7 @@ for path in file_list:
 	data = f.read()
 	f.close()
 	in_memory_files[path] = data
-	documents.append({'_id':path, 'data':data})
+	documents.append({'filename':path, 'data':data})
 
 print 'All files for node',args.node,'are loaded into memory.'
 
