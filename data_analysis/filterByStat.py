@@ -5,58 +5,59 @@ import re
 import sys
 import argparse
 import datetime
+from util import string_to_datetime, is_datetime
 
 parser = argparse.ArgumentParser()
-parser.add_argument('input_files', nargs='+', type=str, help='the files to take as input')
+parser.add_argument('input_files', nargs='*', type=argparse.FileType('r'), default=[sys.stdin], help='the files to take as input')
 parser.add_argument('--type', type=str, dest='type', action='store', required=True)
-parser.add_argument('--ouput', type=str, dest='output', action='store')
+parser.add_argument('--output', nargs='?', type=argparse.FileType('w'), default=sys.stdout, dest='output', action='store')
 
 args = parser.parse_args()
 
-inputs = [ open(name, 'rb') for name in args.input_files ]
-
-if args.output == None:
-	output_file = sys.stdout
-else:
-	output_file = open(args.output, 'wb')
-writer = csv.writer(output_file, delimiter=',', quotechar='"')
+writer = csv.writer(args.output, delimiter=',', quotechar='"')
 
 time_buckets = {}
 
-datetime_regex = re.compile(r'(?P<day>\d\d)-(?P<month>\d\d) (?P<hours>\d\d?)\:(?P<minutes>\d\d)\:(?P<seconds>\d\d)')
-time_regex = re.compile(r'(?P<hours>\d\d?)\:(?P<minutes>\d\d)\:(?P<seconds>\d\d)')
-
-def string_to_datetime(date_str):
-	m = re.match(datetime_regex, date_str)
-	today = datetime.datetime.today()
-	if m != None:
-		d = m.groupdict()
-		return datetime.datetime(today.year, int(d['month']), int(d['day']), int(d['hours']), int(d['minutes']), int(d['seconds']))
-	m = re.match(time_regex, date_str)
-	if m != None:
-		d = m.groupdict()
-		return datetime.datetime(today.year, today.month, today.day, int(d['hours']), int(d['minutes']), int(d['seconds']))
-	else:
-		return None
 #TODO take the right ranges
 if args.type == 'cpu':
-	start_col = 1
-	end_col = 5
+	desired_col_names = ['usr','sys','idl','wai']
 elif args.type == 'disk':
-	start_col = 7
-	end_col = 9
+	desired_col_names = ['read', 'writ']
+elif args.type == 'net':
+	desired_col_names = ['recv', 'send']
 
-for cur_file in inputs:
+host_list = []
+
+for cur_file in args.input_files:
 	cur_reader = csv.reader(cur_file)
+	got_hostname = False
+	# Get the indicies of the columns we want
 	for row in cur_reader:
 		if len(row) == 0:
 			continue
-		if re.match(datetime_regex, row[0]):
+		if row[0] == 'time': #This row has the column headings!
+			desired_col_idx = [ row.index(col_name) for col_name in desired_col_names ]
+			break
+		elif (not got_hostname) and row[0] == 'Host:': # This row tells us which computer this is
+			host_list.append(row[1])
+			got_hostname = True
+	
+	# Read through the rest of the document and take out the data we want
+	for row in cur_reader:
+		if len(row) == 0:
+			continue
+		if is_datetime(row[0]):
 			cur_time = string_to_datetime(row[0])
 			if cur_time not in time_buckets:
 				time_buckets[cur_time] = []
-			time_buckets[cur_time] += row[start_col:end_col]
+			time_buckets[cur_time] += [ row[idx] for idx in desired_col_idx ]
 
+host_headings = ['Hosts']
+for hostname in host_list:
+	host_headings += [hostname] + [None]*(len(desired_col_names)-1)
+writer.writerow(host_headings)
+
+writer.writerow(['system time'] + desired_col_names * len(host_list))
 sorted_keys = time_buckets.keys()
 sorted_keys.sort()
 for key in sorted_keys:
