@@ -15,9 +15,9 @@ total_count = len(file_list)
 partitions = [ file_list[args.chunk_size * i : args.chunk_size * (i + 1)] for i in xrange(total_count / args.chunk_size)]
 
 for idx, file_list in enumerate(partitions):
-	output_file = open(args.output + str(idx), 'w')
+	output_file = open(os.path.join(args.output, str(idx)), 'w')
 	for input_path in file_list:
-		input_file = open(args.data_dir + '/' + input_path)
+		input_file = open(os.path.join(args.data_dir, input_path))
 		data = input_file.read()
 		input_file.close()
 		output_file.write(data)

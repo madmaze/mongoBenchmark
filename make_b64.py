@@ -14,10 +14,10 @@ file_list = os.listdir(args.data_dir)
 
 for path in file_list:
 	print 'starting', path
-	in_file = open(args.data_dir + '/' + path)
+	in_file = open(os.path.join(args.data_dir, path))
 	data = in_file.read()
 	in_file.close()
-	output = open(args.output + '/' + path, 'w')
+	output = open(os.path.join(args.output, path), 'w')
 	output.write(base64.b64encode(data))
 	output.close()
 
