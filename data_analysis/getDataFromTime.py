@@ -8,7 +8,7 @@ import datetime
 from util import string_to_datetime, is_datetime
 
 parser = argparse.ArgumentParser()
-parser.add_argument('input_file', type=argparse.FileType('r'), action='store')
+parser.add_argument('input_file', nargs='?', type=argparse.FileType('r'), default=sys.stdin, action='store')
 parser.add_argument('--start-time', type=str, dest='start_time', action='store', required=True)
 parser.add_argument('--length', type=int, dest='length', action='store', required=True)
 parser.add_argument('--output', nargs='?', type=argparse.FileType('w'), default=sys.stdout, dest='output', action='store')
