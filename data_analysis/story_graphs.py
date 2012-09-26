@@ -47,9 +47,9 @@ def plot_cpu(input_file, axes):
 	user_sys = [ user[i] + system[i] for i in xrange(len(user)) ]
 	usw = [user_sys[i] + waiting[i] for i in xrange(len(user)) ]
 	
-	axes.plot(delta_times, user, color='#FF0000')
-	axes.plot(delta_times, user_sys, color='#00FF00')
-	axes.plot(delta_times, usw, color='#5555FF')
+	#axes.plot(delta_times, user, color='#22AA22', linewidth=2)
+	axes.plot(delta_times, user_sys, color='#22AA22', linewidth=2)
+	axes.plot(delta_times, usw, color='#66FF66')
 	axes.set_ylabel('CPU Utilization (%)')
 	axes.set_xlabel('Time (s)')
 
@@ -73,8 +73,8 @@ def plot_disk(input_file, axes):
 	first_time = times[0]
 	delta_times = [ (time - first_time).seconds for time in times]
 	
-	axes.plot(delta_times, read, color='#5555FF', linewidth=2)
-	axes.plot(delta_times, write, color='#00FF00', linewidth=2)
+	axes.plot(delta_times, read, color='#AAAAFF', linewidth=2)
+	axes.plot(delta_times, write, color='#CCCC00', linewidth=2)
 	axes.set_ylabel('Disk Activity')
 	axes.set_xlabel('Time (s)')
 
@@ -98,8 +98,8 @@ def plot_net(input_file, axes):
 	first_time = times[0]
 	delta_times = [ (time - first_time).seconds for time in times]
 	
-	axes.plot(delta_times, recv, color='#5555FF', linewidth=2)
-	axes.plot(delta_times, send, color='#00FF00', linewidth=2)
+	axes.plot(delta_times, recv, color='#000077', linewidth=2)
+	axes.plot(delta_times, send, color='#FF0000', linewidth=2)
 	axes.set_ylabel('Network Activity')
 	axes.set_xlabel('Time (s)')
 
