@@ -26,15 +26,18 @@ args = parser.parse_args()
 
 startme = """
 import pymongo
+import gridfs
 conn = pymongo.Connection('mongodb://%s:%s@%s/%s')
 
 db = conn['%s']
-col = db['%s']
+grid = gridfs.GridFS(db,"%s")
 """ % (args.user,args.passwd,args.server,args.db,args.db,args.collection) 
 
-timecode = """ 
-col.remove({})
-print col.count()
+timecode = """
+for entry in grid.list():
+  a = grid.get_last_version(filename=entry)
+  grid.delete(a._id)
+print len(grid.list())
 print "Emptied %s[%s] successfully"
 """ % (args.db,args.collection)
 
