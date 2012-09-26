@@ -1,5 +1,5 @@
 #!/bin/bash
-db='testdb'
+db='testdb2'
 usr='testusr'
 passwd='testpw'
 server='mongoServ1'
@@ -11,7 +11,7 @@ for i in $proccnt; do
 	echo "${i} threads:"
 	echo $(date)
 	for j in `seq 1 $i`; do
-		python ./dump_s3.py --node-count $i --node $(($j - 1)) --db $db --user $usr --passwd $passwd --server $server --port $port --collection $collection >> out_dump_${i}_${j} &
+		python ./dump_s3.py --node-count $i --node $(($j - 1)) --db $db --user $usr --passwd $passwd --server $server --port $port --collection $collection >> out_dump_unsharded_${i}_${j} &
 	done
 	wait
 	echo $(date)

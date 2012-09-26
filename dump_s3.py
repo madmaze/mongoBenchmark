@@ -14,7 +14,7 @@ parser.add_argument('--passwd', type=str, dest='passwd', action='store', default
 parser.add_argument('--server', type=str, dest='server', action='store', default='mongoServ1', help='the mongo server')
 parser.add_argument('--port', type=str, dest='port', action='store', default='27017', help='the mongodb port')
 parser.add_argument('--db', type=str, dest='db', action='store', default='testdb', help='the database name')
-parser.add_argument('--data-dir', type=str, dest='data_dir', default='/home/ubuntu/s3_a/', help='the directory containing data to dump from the db')
+parser.add_argument('--data-dir', type=str, dest='data_dir', default='/mnt/s3_a/', help='the directory containing data to dump from the db')
 parser.add_argument('--collection', type=str, dest='collection', default='brains', help='the mongo collection to use')
 # TODO make sure that this default is higher than the number of files from S3
 parser.add_argument('--limit-files', type=int, dest='limit_files', default=100000, help='limit the number of files to suck from the mongo server')
@@ -63,8 +63,8 @@ try:
 		f.close()
 	end = time.time()
 	deltaTime = end - start
-	print "Started at %s" % time.asctime(start)
-	print "Ended at %s" % time.asctime(end)
+	print "Started at %s" % time.asctime(time.gmtime(int(start)))
+	print "Ended at %s" % time.asctime(time.gmtime(int(end)))
 	print chunk_size,'files in', deltaTime,'seconds'
 	print chunk_size / deltaTime, 'files / second'
 finally:
