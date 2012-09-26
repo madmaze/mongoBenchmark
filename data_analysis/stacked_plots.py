@@ -11,11 +11,35 @@ import StringIO
 
 import matplotlib.pyplot as pyplot
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='''
+Takes output from dstat on several computers and combines them into a single figure.
+
+This takes a single file as input.  Each line in the input file describes
+the titles for each sub-plot, the data for that plot, and which statistics
+to display.  For example:
+	
+	Server server_data.csv cpu net
+
+extracts the cpu usage and network data from server_data.csv and plots them
+on a graph named "Server".  Up to two different stat kinds may be specified.
+The starting time of the plots and the length of time they should run are
+additional arguments.  Output will be to the screen, unless a file is
+specified with --output.
+
+Color Key:
+User + System CPU is in dark green.
+Waiting CPU is in light green.
+
+Disk writes are dark blue.
+Disk reads are light blue.
+
+Network sends are red.
+Network recieves are yellow.
+''')
 parser.add_argument('input_file', type=argparse.FileType('r'), action='store')
-parser.add_argument('--start-time', type=str, dest='start_time', action='store', required=True)
-parser.add_argument('--length', type=int, dest='length', action='store', required=True)
-parser.add_argument('--output', nargs='?', type=argparse.FileType('w'), dest='output', action='store')
+parser.add_argument('--start-time', type=str, dest='start_time', action='store', required=True, help='The time at which to start plotting data.')
+parser.add_argument('--length', type=int, dest='length', action='store', required=True, help='The number of seconds of data to plot.')
+parser.add_argument('--output', nargs='?', type=argparse.FileType('w'), dest='output', action='store', help='If specified, the location to save a picture of the plots to.')
 
 args = parser.parse_args()
 
@@ -74,7 +98,7 @@ def plot_disk(input_file, axes):
 	delta_times = [ (time - first_time).seconds for time in times]
 	
 	axes.plot(delta_times, read, color='#AAAAFF', linewidth=2)
-	axes.plot(delta_times, write, color='#CCCC00', linewidth=2)
+	axes.plot(delta_times, write, color='#000077', linewidth=2)
 	axes.set_ylabel('Disk Activity')
 	axes.set_xlabel('Time (s)')
 
@@ -99,7 +123,7 @@ def plot_net(input_file, axes):
 	first_time = times[0]
 	delta_times = [ (time - first_time).seconds for time in times]
 	
-	axes.plot(delta_times, recv, color='#000077', linewidth=2)
+	axes.plot(delta_times, recv, color='#CCCC00', linewidth=2)
 	axes.plot(delta_times, send, color='#FF0000', linewidth=2)
 	axes.set_ylabel('Network Activity')
 	axes.set_xlabel('Time (s)')
