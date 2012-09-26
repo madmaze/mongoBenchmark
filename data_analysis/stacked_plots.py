@@ -139,7 +139,7 @@ for computer in graph_commands:
 	f.close()
 
 
-fig = pyplot.figure(figsize=(9,12))
+fig = pyplot.figure(figsize=(18,12))
 disk_net_axes = []
 #ignore node1 for setting the bounds on the plots
 other_nodes_tops = []
