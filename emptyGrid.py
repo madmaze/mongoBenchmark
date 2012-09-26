@@ -34,6 +34,7 @@ grid = gridfs.GridFS(db,"%s")
 """ % (args.user,args.passwd,args.server,args.db,args.db,args.collection) 
 
 timecode = """
+print len(grid.list())
 for entry in grid.list():
   a = grid.get_last_version(filename=entry)
   grid.delete(a._id)
