@@ -1,0 +1,6 @@
+Client	testclient1.csv disk cpu
+Server	testserv1.csv net disk
+Node1	testnode1.csv net disk
+Node2	testnode2.csv net disk
+Node3	testnode2.csv net disk
+Node4	testnode2.csv net disk
