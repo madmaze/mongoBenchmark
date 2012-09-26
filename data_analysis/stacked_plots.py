@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('input_file', type=argparse.FileType('r'), action='store')
 parser.add_argument('--start-time', type=str, dest='start_time', action='store', required=True)
 parser.add_argument('--length', type=int, dest='length', action='store', required=True)
-parser.add_argument('--output', nargs='?', type=argparse.FileType('w'), default=sys.stdout, dest='output', action='store')
+parser.add_argument('--output', nargs='?', type=argparse.FileType('w'), dest='output', action='store')
 
 args = parser.parse_args()
 
@@ -115,7 +115,7 @@ for computer in graph_commands:
 	f.close()
 
 
-fig = pyplot.figure(figsize=(6,8))
+fig = pyplot.figure(figsize=(9,12))
 for (idx, computer) in enumerate(graph_commands):
 	axes = fig.add_subplot(len(graph_commands), 1, idx+1)
 	second_axes = None
@@ -150,6 +150,9 @@ for (idx, computer) in enumerate(graph_commands):
 		second_axes.set_ylim(top=max_top)
 		
 pyplot.subplots_adjust(top=0.95, bottom=0.05, hspace=0.7)
-pyplot.show()
-	
+
+if args.output != None:
+	pyplot.savefig(args.output)
+else:
+	pyplot.show()
 
