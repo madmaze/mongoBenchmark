@@ -36,7 +36,6 @@ col = db['%s']
 timecode = """
 col.chunks.remove({})
 col.files.remove({})
-print len(grid.list())
 print "Emptied %s[%s] successfully"
 """ % (args.db,args.collection)
 
