@@ -30,14 +30,12 @@ import gridfs
 conn = pymongo.Connection('mongodb://%s:%s@%s/%s')
 
 db = conn['%s']
-grid = gridfs.GridFS(db,"%s")
+col = db['%s']
 """ % (args.user,args.passwd,args.server,args.db,args.db,args.collection) 
 
 timecode = """
-print len(grid.list())
-for entry in grid.list():
-  a = grid.get_last_version(filename=entry)
-  grid.delete(a._id)
+col.chunks.remove({})
+col.files.remove({})
 print len(grid.list())
 print "Emptied %s[%s] successfully"
 """ % (args.db,args.collection)
