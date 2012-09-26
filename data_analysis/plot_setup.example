@@ -2,5 +2,5 @@ Client	testclient1.csv net disk
 Server	testserv1.csv net disk
 Node1	testnode1.csv net disk
 Node2	testnode2.csv net disk
-Node3	testnode2.csv net disk
-Node4	testnode2.csv net disk
+Node3	testnode3.csv net disk
+Node4	testnode4.csv net disk
