@@ -3,7 +3,13 @@
 import pymongo
 import sys
 import timeit
+import os
 
+my_id = int(sys.argv[1])-1
+for x in xrange(int(sys.argv[1])-1):
+	if os.fork() == 0:
+		my_id = x
+		break
 
 user = "testusr"
 passwd = "testpw"
@@ -11,7 +17,7 @@ dbname = "testdb"
 #server = "ds037627-a.mongolab.com:37627"
 server = "localhost:27017"
 inserts = 5000
-execcnt = 500
+execcnt = 50
 collname = "collection"
 
 startme = """
@@ -40,4 +46,6 @@ runme = timeit.Timer(stmt=timecode,setup=startme)
 
 res = runme.timeit(number=execcnt)
 
-print "Successfully tried %d inserts in %f seconds" % (inserts * execcnt,res)
+f = open('output_' + str(my_id) + '.txt', 'w')
+f.write("%f\n" % (res,))
+f.close()
